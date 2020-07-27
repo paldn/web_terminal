@@ -1,9 +1,32 @@
 function get_connect_info() {
-    var host = $.trim($('#host').val());
-    var port = $.trim($('#port').val());
-    var user = $.trim($('#user').val());
-    var pwd = $.trim($('#password').val());
+
+    var params = {
+        "host":"localhost",
+        "port":"23",
+        "user":"root",
+        "pwd":"root"
+    };
+    var querys = window.location.href.split("?")[1].split("&")
+    for(var i=0;i<querys.length;i++)
+    {
+        var _i = querys[i].indexOf("=")
+        if(_i==-1)
+        {
+            $("#terminal").text("Invaild Query Params！")
+            break;
+        }
+        var key = querys[i].substr(0,_i)
+        var val = querys[i].substr(_i+1)
+        if(!params[key])continue;
+        params[key] = val
+    }
+
+    var host = $.trim(params["host"]);
+    var port = $.trim(params["port"]);
+    var user = $.trim(params["user"]);
+    var pwd = $.trim(params["pwd"]);
     var password = window.btoa(pwd);
+
     var connect_info = 'host=' + host + '&port=' + port + '&user=' + user + '&password=' + password;
     return connect_info
 }
@@ -37,7 +60,7 @@ function websocket() {
         }
         ),
         protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://',
-        socketURL = protocol + location.hostname + ((location.port) ? (':' + location.port) : '') + '/ws?' + connect_info;
+        socketURL = protocol + location.hostname + ((location.port) ? (':' + location.port) : '') + '/telnet?' + connect_info;
 
     var sock;
     sock = new WebSocket(socketURL);
@@ -75,6 +98,10 @@ function websocket() {
 			//$('#form').removeClass('hide');
         }
     });
+    sock.addEventListener('close',function()
+    {
+        $("#terminal").html("connection lost!")
+    });
 
     /*
     * status 为 0 时, 将用户输入的数据通过 websocket 传递给后台, data 为传递的数据, 忽略 cols 和 rows 参数
@@ -96,3 +123,8 @@ function websocket() {
         term.resize(cols, rows)
     })
 }
+
+$(function()
+{
+    websocket();
+})

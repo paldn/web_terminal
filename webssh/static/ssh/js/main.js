@@ -79,7 +79,7 @@ jQuery(function($){
 
   function restore_items(names) {
     var i, name, value;
-
+    
     for (i=0; i < names.length; i++) {
       name = names[i];
       value = window.localStorage.getItem(name);
@@ -355,7 +355,7 @@ jQuery(function($){
 
     var ws_url = window.location.href.replace("/webssh","").split(/\?|#/, 1)[0].replace('http', 'ws'),
         join = (ws_url[ws_url.length-1] === '/' ? '' : '/'),
-        url = ws_url + join + 'ws?id=' + msg.id,
+        url = ws_url + join + 'ssh?id=' + msg.id,
         sock = new window.WebSocket(url),
         encoding = 'utf-8',
         decoder = window.TextDecoder ? new window.TextDecoder(encoding) : encoding,
@@ -548,6 +548,7 @@ jQuery(function($){
 
 
   function wrap_object(opts) {
+
     var obj = {};
 
     obj.get = function(attr) {
@@ -663,7 +664,6 @@ jQuery(function($){
     function ajax_post() {
       status.text('');
       button.prop('disabled', true);
-
       $.ajax({
           url: url,
           type: 'post',
@@ -702,7 +702,7 @@ jQuery(function($){
     var form = document.querySelector(form_id),
         url = data.url || form.action,
         _xsrf = form.querySelector('input[name="_xsrf"]');
-
+    
     var result = validate_form_data(wrap_object(data));
     if (!result.valid) {
       log_status(result.errors.join('\n'));
@@ -732,7 +732,6 @@ jQuery(function($){
   function connect(hostname, port, username, password, privatekey, passphrase, totp) {
     // for console use
     var result, opts;
-
     if (state !== DISCONNECTED) {
       console.log(messages[state]);
       return;

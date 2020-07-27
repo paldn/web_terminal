@@ -64,32 +64,6 @@ jQuery(function($){
       hostname_tester = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))|(^\s*((?=.{1,255}$)(?=.*[A-Za-z].*)[0-9A-Za-z](?:(?:[0-9A-Za-z]|\b-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|\b-){0,61}[0-9A-Za-z])?)*)\s*$)/;
 
 
-  function store_items(names, data) {
-    var i, name, value;
-
-    for (i = 0; i < names.length; i++) {
-      name = names[i];
-      value = data.get(name);
-      if (value){
-        window.localStorage.setItem(name, value);
-      }
-    }
-  }
-
-
-  function restore_items(names) {
-    var i, name, value;
-
-    for (i=0; i < names.length; i++) {
-      name = names[i];
-      value = window.localStorage.getItem(name);
-      if (value) {
-        $('#'+name).val(value);
-      }
-    }
-  }
-
-
   function populate_form(data) {
     var names = form_keys.concat(['passphrase']),
         i, name;
@@ -116,16 +90,6 @@ jQuery(function($){
   }
 
 
-  function decode_password(encoded) {
-    try {
-      return window.atob(encoded);
-    } catch (e) {
-       console.error(e);
-    }
-    return null;
-  }
-
-
   function parse_url_data(string, form_keys, opts_keys, form_map, opts_map) {
     var i, pair, key, val,
         arr = string.split('&');
@@ -140,10 +104,6 @@ jQuery(function($){
       } else if (opts_keys.indexOf(key) >=0) {
         opts_map[key] = val;
       }
-    }
-
-    if (form_map.password) {
-      form_map.password = decode_password(form_map.password);
     }
   }
 
@@ -330,10 +290,6 @@ jQuery(function($){
     if (waiter.css('display') !== 'none') {
       waiter.hide();
     }
-
-    if (form_container.css('display') === 'none') {
-      form_container.show();
-    }
   }
 
 
@@ -353,9 +309,9 @@ jQuery(function($){
       return;
     }
 
-    var ws_url = window.location.href.split(/\?|#/, 1)[0].replace('http', 'ws'),
+    var ws_url = window.location.href.replace("/webssh","").split(/\?|#/, 1)[0].replace('http', 'ws'),
         join = (ws_url[ws_url.length-1] === '/' ? '' : '/'),
-        url = ws_url + join + 'ws?id=' + msg.id,
+        url = ws_url.replace("/ssh_terminal","") + join + 'ssh?id=' + msg.id,
         sock = new window.WebSocket(url),
         encoding = 'utf-8',
         decoder = window.TextDecoder ? new window.TextDecoder(encoding) : encoding,
@@ -537,6 +493,7 @@ jQuery(function($){
       state = DISCONNECTED;
       default_title = 'WebSSH';
       title_element.text = default_title;
+      $("#status").text("connection lost!")
     };
 
     $(window).resize(function(){
@@ -654,7 +611,7 @@ jQuery(function($){
         inputs = form.querySelectorAll('input[type="file"]'),
         url = form.action,
         data, pk;
-
+    alert(url)
     disable_file_inputs(inputs);
     data = new FormData(form);
     pk = data.get('privatekey');
@@ -663,7 +620,6 @@ jQuery(function($){
     function ajax_post() {
       status.text('');
       button.prop('disabled', true);
-
       $.ajax({
           url: url,
           type: 'post',
@@ -674,7 +630,6 @@ jQuery(function($){
           processData: false
       });
     }
-
     var result = validate_form_data(data);
     if (!result.valid) {
       log_status(result.errors.join('\n'));
@@ -764,7 +719,6 @@ jQuery(function($){
       if (hostname) {
         validated_form_data = result.data;
       }
-      store_items(fields, result.data);
     }
   }
 
@@ -812,7 +766,6 @@ jQuery(function($){
     );
   }
 
-
   parse_url_data(
     decode_uri(window.location.search.substring(1)) + '&' + decode_uri(window.location.hash.substring(1)),
     form_keys, opts_keys, url_form_data, url_opts_data
@@ -825,14 +778,12 @@ jQuery(function($){
   }
 
   if (url_form_data.password === null) {
+    
     log_status('Password via url must be encoded in base64.');
   } else {
     if (get_object_length(url_form_data)) {
       waiter.show();
       connect(url_form_data);
-    } else {
-      restore_items(fields);
-      form_container.show();
     }
   }
 

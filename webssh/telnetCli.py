@@ -90,6 +90,7 @@ class TelnetClient:
             while True:
                 data = self.tn.read_very_eager().decode('utf-8')
                 if not len(data):
+                    time.sleep(0.1)
                     continue
                 self.message['status'] = 0
                 self.message['message'] = data

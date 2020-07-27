@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>webtelnet</title>
+    <link rel="icon" href="/static/telnet/favicon.ico"/>
+    <link rel="stylesheet" href="/static/telnet_terminal/xterm/xterm.css"/>
+    <link rel="stylesheet" href="/static/telnet_terminal/xterm/style.css"/>
+    <link rel="stylesheet" href="/static/telnet_terminal/bootstrap.min.css"/>
+    <style>
+        html,body{padding:0;border:0;margin:0;width:100%;height:100%;}
+        .input-width {
+            width: 20%;
+            display: inline-block;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+	
+	<script>
+		function checkwindow() {
+			event.returnValue=false;
+		}
+	</script>
+	
+</head>
+<body>
+<div id="django-webtelnet-terminal" class="hide">
+    <div id="terminal"></div>
+</div>
+
+
+<script src="/static/telnet_terminal/jquery.min.js"></script>
+<script src="/static/telnet_terminal/xterm/xterm.js"></script>
+<script src="/static/telnet_terminal/webtelnet.js"></script>
+
+</body>
+</html>

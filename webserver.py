@@ -6,7 +6,7 @@ import asyncio
 
 from tornado.options import options
 from webssh import handler
-from webssh.handler import IndexPageHandler, SSHPageHandler,TelnetPageHandler,WsockHandler, NotFoundHandler
+from webssh.handler import IndexPageHandler, SSHPageHandler,TelnetPageHandler,SSHTerminalHandler,TelnetTerminalHandler,WsockHandler, NotFoundHandler
 from webssh.settings import (
     get_app_settings,  get_host_keys_settings, get_policy_setting,
     get_ssl_context, get_server_settings, check_encoding_setting
@@ -17,6 +17,7 @@ from webssh import telnetCli
 #from webtelnet.handler import TelnetWsockHandler,TelnetIndextHandler
 import json
 
+
 def make_handlers(loop, options):
     host_keys_settings = get_host_keys_settings(options)
     policy = get_policy_setting(options, host_keys_settings)
@@ -26,7 +27,12 @@ def make_handlers(loop, options):
         (r'/webssh', SSHPageHandler, dict(loop=loop, policy=policy,
                                   host_keys_settings=host_keys_settings)),
         (r'/webtelnet', TelnetPageHandler, dict(loop=loop)),
-        (r'/ws', WsockHandler, dict(loop=loop)),
+
+        (r'/ssh_terminal', SSHTerminalHandler, dict(loop=loop, policy=policy,
+                                  host_keys_settings=host_keys_settings)),
+        (r'/telnet_terminal', TelnetTerminalHandler, dict(loop=loop)),
+
+        (r'/ssh', WsockHandler, dict(loop=loop)),
         (r'/telnet',telnetCli.TelnetHandler,dict(loop=loop))
     ]
     return handlers
