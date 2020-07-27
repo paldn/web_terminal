@@ -5,7 +5,6 @@ from tornado.ioloop import IOLoop
 import json
 import time
 import traceback
-from channels.generic.websocket import WebsocketConsumer
 import os
 import json
 import base64
