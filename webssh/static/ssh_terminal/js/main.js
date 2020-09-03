@@ -3,6 +3,8 @@
 var jQuery;
 var wssh = {};
 
+var theme = {bgcolor:'#000000',color:'#ffffff'};
+
 
 (function() {
   // For FormData without getter and setter
@@ -32,6 +34,25 @@ var wssh = {};
       data[name] = value;
     };
   }
+
+
+
+  var querys = window.location.href.split("?")[1].split("&")
+  for(var i=0;i<querys.length;i++)
+  {
+      var _i = querys[i].indexOf("=")
+      if(_i==-1)
+      {
+          break;
+      }
+      var key = querys[i].substr(0,_i)
+      var val = querys[i].substr(_i+1)
+      if(!theme[key])continue;
+      theme[key] = val
+  }
+
+
+
 }());
 
 
@@ -56,7 +77,7 @@ jQuery(function($){
       key_max_size = 16384,
       fields = ['hostname', 'port', 'username'],
       form_keys = fields.concat(['password', 'totp']),
-      opts_keys = ['bgcolor', 'title', 'encoding', 'command', 'term'],
+      opts_keys = ['bgcolor',"color" ,'title', 'encoding', 'command', 'term'],
       url_form_data = {},
       url_opts_data = {},
       validated_form_data,
@@ -153,6 +174,12 @@ jQuery(function($){
   function set_backgound_color(term, color) {
     term.setOption('theme', {
       background: color
+    });
+  }
+
+  function set_foreound_color(term, color) {
+    term.setOption('theme', {
+      foreground: color
     });
   }
 
@@ -312,6 +339,7 @@ jQuery(function($){
     var ws_url = window.location.href.replace("/webssh","").split(/\?|#/, 1)[0].replace('http', 'ws'),
         join = (ws_url[ws_url.length-1] === '/' ? '' : '/'),
         url = ws_url.replace("/ssh_terminal","") + join + 'ssh?id=' + msg.id,
+        
         sock = new window.WebSocket(url),
         encoding = 'utf-8',
         decoder = window.TextDecoder ? new window.TextDecoder(encoding) : encoding,
@@ -319,7 +347,8 @@ jQuery(function($){
         term = new window.Terminal({
           cursorBlink: true,
           theme: {
-            background: url_opts_data.bgcolor || 'black'
+            background: theme.bgcolor,
+            foreground: theme.color
           }
         });
 
@@ -440,7 +469,10 @@ jQuery(function($){
     wssh.set_bgcolor = function(color) {
       set_backgound_color(term, color);
     };
-
+    wssh.set_foreound_color = function(color)
+    {
+      set_foreound_color(term,color);
+    };
     wssh.custom_font = function() {
       update_font_family(term);
     };

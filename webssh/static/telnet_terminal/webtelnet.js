@@ -1,11 +1,14 @@
+var params = {
+    "host":"localhost",
+    "port":"23",
+    "user":"root",
+    "pwd":"root",
+    "bgcolor":"#000000",
+    "color":"#ffffff"
+};
 function get_connect_info() {
 
-    var params = {
-        "host":"localhost",
-        "port":"23",
-        "user":"root",
-        "pwd":"root"
-    };
+    
     var querys = window.location.href.split("?")[1].split("&")
     for(var i=0;i<querys.length;i++)
     {
@@ -25,6 +28,7 @@ function get_connect_info() {
     var port = $.trim(params["port"]);
     var user = $.trim(params["user"]);
     var pwd = $.trim(params["pwd"]);
+
     var password = window.btoa(pwd);
 
     var connect_info = 'host=' + host + '&port=' + port + '&user=' + user + '&password=' + password;
@@ -50,13 +54,18 @@ function websocket() {
     var cols = get_term_size().cols;
     var rows = get_term_size().rows;
     var connect_info = get_connect_info();
-
     var term = new Terminal(
         {
             cols: cols,
             rows: rows,
             useStyle: true,
-            cursorBlink: true
+            cursorBlink: true,
+            theme: {
+                foreground: params.color, //字体
+                background: params.bgcolor, //背景色
+                cursor: 'help',//设置光标
+            }
+        
         }
         ),
         protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://',
@@ -71,7 +80,7 @@ function websocket() {
         $('#django-webtelnet-terminal').removeClass('hide');
         term.open(document.getElementById('terminal'));
 		term.focus();
-		$("body").attr("onbeforeunload",'checkwindow()'); //增加刷新关闭提示属性
+		//$("body").attr("onbeforeunload",'checkwindow()'); //增加刷新关闭提示属性
 		
     });
 
@@ -86,7 +95,7 @@ function websocket() {
             //window.location.reload() 端口连接后刷新页面
 			//term.clear()
 			term.write(message)
-			$("body").removeAttr("onbeforeunload"); //删除刷新关闭提示属性
+			//$("body").removeAttr("onbeforeunload"); //删除刷新关闭提示属性
 			
 			//$(document).keyup(function(event){	// 监听回车按键事件
 			//	if(event.keyCode == 13){
